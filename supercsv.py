@@ -1,4 +1,4 @@
-#supercsv_0_1
+#supercs v_0_2
 import csvtosql
 import csv
 
