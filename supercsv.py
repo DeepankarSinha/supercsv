@@ -1,4 +1,5 @@
 #supercsv_0_1
+import csvtosql
 import csv
 
 
@@ -102,35 +103,16 @@ def show(i=None, j=None):
            print(row[j])
 
 ################################################################
+table_name=""
 
-__selection=[]
+def tabulate():
+    global table_name
+    csvtosql.create_table(__rowHeader,__sheet)
+    table_name=csvtosql.table_name
 
-def select(*clist):
-    """selects column and return the selection list"""
-    global __selection,totalColumns
-    del __selection[:]
-    if not clist:
-        __selection=__sheet
-    elif hasHeader:
-        flag=False
-        for data in clist:
-            if data not in __rowHeader:
-                flag=True
-                break
-        if flag:
-            print('Column not found')
-        else:
-            for data in clist:
-                __selection.append(get_column(get_column_number(data)))
-    else:
-        for i in clist:
-            if i >= 0 and i < totalColumns:
-                __selection.append(get_column(i))
-            else:
-                print('Operation failed. Index out of bound')
-                del __selection[:]
-    return __selection
-        
-           
-    
-    
+def query(q):
+    cur=csvtosql.run_query(q)
+    for row in cur:
+        print(", ".join(row))
+
+
