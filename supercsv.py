@@ -1,43 +1,35 @@
-#supercs v_0_2
+#supercsv v_0_3
 import csvtosql
 import csv
+from os import path
 
-
-__sheet=[]
-__rowHeader=[]
-hasHeader=False
-cursorx=0
-cursory=0
-totalRows=0
-totalColumns=0
-
-__all__ = ["load","load_reaortder","get_row","get_column","get_column_number","eac",
-           "mc","show","select"]
+table={}
+totalRows = 0
+totalColumns = 0
 
 def load(filename, rowHeader=False):
     """loads a csv file exported by MS excel or equivalent format"""
-    global totalRows
-    global totalColumns, hasHeader, __sheet, __rowHeader
-    del __sheet[:]
-    hasHeader=rowHeader
-    totalRows=totalColumns=0
-    with open(filename) as csvfile:
-        _reader = csv.reader(csvfile)
-        for row in _reader:
-            totalRows+=1
-            if rowHeader:
-                __rowHeader=list(row)
-                rowHeader=False
-            else:
-                __sheet.append(row)
-        totalColumns=len(__sheet[0])
+    if isinstance(filename, str):
+        try:
+            with open(filename) as csvfile:
+                _reader = csv.reader(csvfile)
+                __load__(filename, _reader, rowHeader)
+        except Exception,e:
+            print(e)
+    else:
+        load_reader(filename, rowHeader)
 
-def load_reader(_reader, rowHeader=False):
+def load_reader(reader, filename, rowHeader=False):
     """loads a predefined csv.reader object"""
-    global totalRows
-    global totalColumns, hasHeader, __sheet, __rowHeader
-    del __sheet[:]
-    totalRows=totalColumns=0
+    if not isinstance(reader, str):
+        __load__(filename, reader, rowHeader)
+    else:
+        load(reader, rowHeader)
+
+def __load__(filename, _reader, rowHeader):
+    global table, totalRows, totalColumns
+    __rowHeader=[]
+    __sheet=[]
     for row in _reader:
         totalRows+=1
         if rowHeader:
@@ -46,73 +38,46 @@ def load_reader(_reader, rowHeader=False):
         else:
             __sheet.append(row)
     totalColumns=len(__sheet[0])
+    table_name=__tabulate(__rowHeader, __sheet)
+    table[path.splitext(path.basename(filename))[0]]=table_name
+    
 
-def get_row(rowNumber):
-    """returns a row as a list"""
-    row=__sheet[rowNumber]
-    return row
-
-def get_column(columnNumber):
-    """returns a column as a list"""
-    entry=[]
-    for row in __sheet:
-        entry.append(row[columnNumber])
-    return entry
-
-def get_column_number(columnName):
-    """returns index of a column"""
-    for i,x in enumerate(__rowHeader):
-        if x == columnName:
-            return i
-
-def eac():
-    """eac stands for Entry At Cursor"""
-    row=__sheet[cursorx]
-    return row[cursory]
-
-def mc(x=0, y=0):
-    """mc stands for Move Cursor
-       Moves the cursor by x and y values
-    """
-    global cursorx, cursory
-    if cursorx+x >= 0 and cursorx+x < totalRows:
-        if cursory+y >= 0 and cursory+y < totalColumns:
-            cursorx=cursorx+x
-            cursory=cursory+y
-        else:
-            print('The cursor could not be moved. Error moving cursor by y values')
-    else:
-        print('The cursor could not be moved. Error moving cursor by x values')
- 
-def show(i=None, j=None):
-    """print the csv file
-       i- ith row
-       j- jth column
-    """
-    if i is None and j is None:
-           for row in __sheet:
-               print(', '.join(row))
-    elif i is not None and j is None:
-           row=__sheet[i]
-           print(', '.join(row))
-    elif i is None and j is not None:
-           row=__sheet[j]
-           print(', '.join(row))
-    else:
-           row=__sheet[i]
-           print(row[j])
-
-################################################################
-table_name=""
-
-def tabulate():
+        
+def __tabulate(__rowHeader, __sheet):
+    """Create a temporary sqlite table in memory"""
     global table_name
     csvtosql.create_table(__rowHeader,__sheet)
-    table_name=csvtosql.table_name
+    return csvtosql.table_name
 
 def query(q):
+    """Run a sql query"""
     cur=csvtosql.run_query(q)
+    selection=[]
     for row in cur:
-        print(", ".join(row))
+        selection.append(row)
+    return selection
 
+def select(tableName, columnNames='*', where=''):
+    """Select operation"""
+    q="SELECT "+columnNames+" FROM "+tableName
+    if not where:
+        q+="WHERE "+where
+    return query(q)
 
+def write(filename, table):
+    """Write selected table to a file in csv format"""
+    if type(table) is list:
+        try:
+            fo=open(filename, 'w')
+            for row in table:
+                line=",".join(map(str,row))
+                fo.write(line+"\n")
+            fo.close()
+        except Exception, e:
+            print(e)
+    else:
+        print("table parameter should be a list")
+
+##load('sample.csv')
+##table=query("SELECT col_0,col_2 FROM "+table['sample'])
+##write('fruit.csv',table)
