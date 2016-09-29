@@ -24,15 +24,11 @@ def is_Real(s):
         return False
 
 def create_table(header,sheet):
-    print(header)
     global __sheet
     __sheet=sheet
-    #print("holla")
     tr1=__sheet[0]
     tr2=__sheet[1]
     datatype=[]
-    #print(tr1)
-    
     for i in range(len(tr1)):
         n=tr1[i]
         m=tr2[i]
@@ -63,8 +59,6 @@ def create_table(header,sheet):
     sql += ', '.join(('? ' * len(tr1)).split())
     sql += ');'
 
-    print (sql)
-    
     for row in __sheet:
         cur.execute(sql,tuple(row))
         db.commit()
