@@ -64,13 +64,20 @@ def select(tableName, columnNames='*', where=''):
         q+="WHERE "+where
     return query(q)
 
-def write(filename, table):
+def write(filename, table, delimiter = ",", quotation = "\""):
     """Write selected table to a file in csv format"""
     if type(table) is list:
         try:
-            fo=open(filename, 'w')
+            fo = open(filename, 'w')
             for row in table:
-                line=",".join(map(str,row))
+                line = ""
+                for cell in row:
+                    s = str(cell)
+                    if s.find(delimiter) != -1:
+                        line += quotation+s+quotation+delimiter+" "
+                    else:
+                        line += s+delimiter+" "
+                line = line[:len(line)-2]
                 fo.write(line+"\n")
             fo.close()
         except Exception, e:
@@ -79,5 +86,5 @@ def write(filename, table):
         print("table parameter should be a list")
 
 ##load('sample.csv')
-##table=query("SELECT col_0,col_2 FROM "+table['sample'])
+##table=query("SELECT * FROM "+table['sample'])
 ##write('fruit.csv',table)
