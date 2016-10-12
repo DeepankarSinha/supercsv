@@ -25,7 +25,7 @@ selection = supercsv.query("SELECT * FROM "+table_name)
 ```
 This is not tested but you can load multiple csv file and use 'join' operation.
 
-You can also write your query result to a file in csv format with ',' as delimiter
+You can also write your query result to a file in csv format with ',' as default delimiter and '"' as default quotation 
 ```python
 supercsv.write('file.csv', selection)
 ```
