@@ -73,12 +73,12 @@ def write(filename, table, delimiter = ",", quotation = "\""):
             for row in table:
                 line = ""
                 for cell in row:
-                    s = str(cell)
+                    s = str(cell).strip()
                     if s.find(delimiter) != -1:
-                        line += quotation+s+quotation+delimiter+" "
+                        line += quotation+s+quotation+delimiter
                     else:
-                        line += s+delimiter+" "
-                line = line[:len(line)-2]
+                        line += s+delimiter
+                line = line[:len(line)-1]
                 fo.write(line+"\n")
             fo.close()
         except Exception, e:
