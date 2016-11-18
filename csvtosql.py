@@ -1,4 +1,4 @@
-#csvtosql v1_0_0
+#csvtosql v1_0_1
 import re
 import time
 import sqlite3
@@ -7,6 +7,7 @@ __sheet=[]
 
 table_name = 'temp_table_{0}'.format(int(time.time()))
 db = sqlite3.connect(':memory:')
+db.text_factory = str
 cur=db.cursor()
 
 def is_Integer(s):

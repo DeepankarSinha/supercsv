@@ -1,4 +1,4 @@
-#supercsv v_0_3
+#supercsv v_0_4
 import csvtosql
 import csv
 from os import path
@@ -15,6 +15,7 @@ def load(filename, rowHeader=False):
                 _reader = csv.reader(csvfile)
                 __load__(filename, _reader, rowHeader)
         except Exception,e:
+            print("supercsv error: ")
             print(e)
     else:
         load_reader(filename, rowHeader)
