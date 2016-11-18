@@ -1,5 +1,5 @@
 # supercsv
-### version: v 0.3
+### version: v 0.4S
 #####Read CSV files in the way you wanted directly from your python code.
 #####Run sql query and write to a csv file without any effort.
 
